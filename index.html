@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>要不要跟我去約會？</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"PingFang TC","PingFang SC","Noto Sans TC","Microsoft JhengHei",sans-serif;background:#f7f2fb;display:flex;align-items:center;justify-content:center;padding:16px}
+#app button,#app input{font:inherit;cursor:pointer}
+.step{display:none}
+.step.active{display:block;animation:fadeUp .28s ease-out}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.card{background:#fff;border-radius:16px;box-shadow:0 12px 32px rgba(150,110,200,.16);padding:32px 24px;max-width:440px;width:100%;margin:48px auto 24px;text-align:center}
+.pink-btn{background:#1f1f1f;color:#fff;border:none;border-radius:999px;padding:12px 30px;font-size:16px;font-weight:500;transition:transform .2s ease-out,opacity .15s}
+.pink-btn:disabled{opacity:.35;cursor:not-allowed}
+.ghost-btn{background:#fff;color:#777;border:1px solid #e3dbea;border-radius:999px;padding:12px 24px}
+#noBtn{position:absolute;z-index:5;transition:left .22s ease-out,top .22s ease-out,transform .22s ease-out}
+#yesBtn{transition:transform .22s ease-out}
+.pear{position:absolute;animation:float 4.2s ease-in-out infinite alternate;filter:drop-shadow(0 4px 6px rgba(150,110,200,.14))}
+@keyframes float{from{transform:translateY(0) rotate(var(--rot,0deg))}to{transform:translateY(-9px) rotate(var(--rot,0deg))}}
+.dot{display:inline-block;width:8px;height:8px;border-radius:999px;background:#e3dbea;margin:0 4px;transition:background .15s}
+.dot.on{background:#f08bb4}
+.food-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}
+.food{border:1px solid #e3dbea;border-radius:12px;background:#faf7fc;padding:18px 8px 14px;font-size:15px;transition:border-color .15s,transform .15s}
+.food:hover{transform:translateY(-2px)}
+.food.sel{border-color:#1f1f1f}
+.food .e{font-size:32px;display:block;margin-bottom:6px}
+#dateInput{padding:10px 14px;border-radius:10px;border:1px solid #e3dbea;background:#fff;color:#1f1f1f;margin-top:16px}
+.hb{position:absolute;pointer-events:none;animation:rise 1s ease-out forwards;z-index:9}
+@keyframes rise{from{opacity:1;transform:translateY(0) scale(.8)}to{opacity:0;transform:translateY(-80px) scale(1.3)}}
+.letter{text-align:left;line-height:1.9;font-size:15px;color:#333}
+.letter p{margin:0 0 12px}
+.sig{text-align:right;color:#888}
+.meta-line{font-size:12px;color:#a79fb0;margin-bottom:16px}
+</style>
+</head>
+<body>
+
+<div id="app" style="position:relative;border-radius:16px;overflow:hidden;min-height:640px;width:100%;max-width:640px;padding:16px;background:linear-gradient(165deg,#fdeef5,#f1e9fd)">
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+<symbol id="pear" viewBox="0 0 24 24">
+<path d="M12 2.6c2.1 0 3.4 1.7 3.3 3.7-.1 1.4.5 2.3 1.7 3.4 1.6 1.5 2.4 3.1 2.4 4.9A7.4 7.4 0 0 1 12 21.9a7.4 7.4 0 0 1-7.4-7.3c0-1.8.8-3.4 2.4-4.9 1.2-1.1 1.8-2 1.7-3.4-.1-2 1.2-3.7 3.3-3.7Z" fill="#f2cf6b"/>
+<path d="M12 2.6c.4 0 .8.1 1.1.2-.9.5-1.5 1.4-1.4 2.5.1 1.4-.5 2.3-1.7 3.4-1.6 1.5-2.4 3.1-2.4 4.9 0 3.5 2.6 6.4 6 7.2-.5.1-1 .1-1.6.1A7.4 7.4 0 0 1 4.6 14.6c0-1.8.8-3.4 2.4-4.9 1.2-1.1 1.8-2 1.7-3.4-.1-2 1.2-3.7 3.3-3.7Z" fill="#eebe4e"/>
+<path d="M12 2.8c.3-.9 1-1.6 2-1.8" stroke="#8fbf6f" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+<ellipse cx="15.7" cy="3.4" rx="2.3" ry="1.2" fill="#86b96a" transform="rotate(24 15.7 3.4)"/>
+<circle cx="9.6" cy="12.4" r=".9" fill="#333"/>
+<circle cx="14.4" cy="12.4" r=".9" fill="#333"/>
+<circle cx="9.1" cy="14.1" r=".9" fill="rgba(240,139,180,.4)"/>
+<circle cx="14.9" cy="14.1" r=".9" fill="rgba(240,139,180,.4)"/>
+<path d="M10.9 13.6c.6.7 1.6.7 2.2 0" stroke="#333" stroke-width="1" stroke-linecap="round" fill="none"/>
+</symbol>
+</svg>
+
+<svg class="pear" style="left:5%;top:12%;width:58px;--rot:-10deg"><use href="#pear"/></svg>
+<svg class="pear" style="right:7%;top:9%;width:44px;--rot:12deg;animation-delay:.6s"><use href="#pear"/></svg>
+<svg class="pear" style="left:11%;bottom:8%;width:48px;--rot:8deg;animation-delay:1.2s"><use href="#pear"/></svg>
+<svg class="pear" style="right:10%;bottom:12%;width:62px;--rot:-6deg;animation-delay:.3s"><use href="#pear"/></svg>
+<svg class="pear" style="left:44%;top:3%;width:36px;--rot:16deg;animation-delay:1.8s"><use href="#pear"/></svg>
+
+<div style="text-align:center;padding-top:8px"><span class="dot on"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>
+
+<section class="step active" id="s1">
+  <div class="card">
+    <div style="font-size:42px;line-height:1;margin-bottom:12px">🧸</div>
+    <div style="font-size:22px;font-weight:500;letter-spacing:.5px">要不要跟我去約會？</div>
+    <div style="font-size:13px;color:#a79fb0;margin-top:8px">這題只有一個正確答案哦 ♥</div>
+    <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;align-items:center">
+      <button class="pink-btn" id="yesBtn">好哦 ♥</button>
+      <button class="ghost-btn" id="noBtn">否</button>
+    </div>
+    <div id="fleeMsg" style="font-size:13px;color:#a79fb0;margin-top:18px;min-height:20px"></div>
+  </div>
+</section>
+
+<section class="step" id="s2">
+  <div class="card">
+    <div style="font-size:36px;line-height:1;margin-bottom:12px">💌</div>
+    <div style="font-size:20px;font-weight:500">什麼時候出發呢？</div>
+    <div style="font-size:13px;color:#a79fb0;margin-top:8px">挑一天你方便的，我來安排</div>
+    <input type="date" id="dateInput"><br>
+    <div id="datePrev" style="font-size:14px;color:#555;margin-top:10px;min-height:20px"></div>
+    <button class="pink-btn" id="dateBtn" disabled style="margin-top:12px">就這天！</button>
+  </div>
+</section>
+
+<section class="step" id="s3">
+  <div class="card">
+    <div style="font-size:36px;line-height:1;margin-bottom:12px">🍽️</div>
+    <div style="font-size:20px;font-weight:500">想吃什麼？</div>
+    <div class="food-grid">
+      <button class="food" data-food="火鍋"><span class="e">🍲</span>火鍋</button>
+      <button class="food" data-food="米線"><span class="e">🍜</span>米線</button>
+      <button class="food" data-food="肉肉"><span class="e">🍖</span>肉肉</button>
+      <button class="food" data-food="拉麵"><span class="e">🍥</span>拉麵</button>
+    </div>
+  </div>
+</section>
+
+<section class="step" id="s4">
+  <div class="card" style="margin-top:32px">
+    <div style="font-size:32px;line-height:1">💗</div>
+    <div style="font-size:20px;font-weight:500;margin-top:8px">給 karen 的一封信</div>
+    <div class="meta-line" id="letterMeta"></div>
+    <div class="letter">
+      <p>最可愛的 karen：</p>
+      <p>想了很久，還是想親口問你——要不要，跟我去約會？</p>
+      <p>我已經偷偷計劃好了：我們在 <b id="ld"></b> 出發，先去吃你選的 <b id="lf"></b>，吃飽以後就牽著手慢慢亂逛。去哪裡都可以，只要身邊是你。</p>
+      <p>如果那天風很大，我就站在迎風的那一側；如果那天下雨，傘會悄悄往你那邊多傾斜一點。</p>
+      <p>世界很吵，但跟你在一起的時候，一切都變得剛剛好。</p>
+      <p>所以，答案是——好哦 ♥</p>
+      <p class="sig">偷偷喜歡你的人 敬上</p>
+    </div>
+    <button class="ghost-btn" id="againBtn" style="margin-top:8px">再看一次</button>
+  </div>
+</section>
+</div>
+
+<script>
+(function(){
+var app=document.getElementById('app');
+var yesBtn=document.getElementById('yesBtn');
+var noBtn=document.getElementById('noBtn');
+var fleeMsg=document.getElementById('fleeMsg');
+var escapes=0, chosenDate='', chosenFood='';
+var noTexts=['否','再想想？','確定嗎？','給個機會嘛','我會很傷心的','跑不掉啦 ♥'];
+var fleeMsgs=['欸？怎麼按不到？','我的手比較快哦','再跑快一點試試看～','放棄吧，你只剩一個選擇了 ♥','好哦按鈕已經等不及了 ♥'];
+
+function showStep(n){
+  var ss=app.querySelectorAll('.step');
+  for(var i=0;i<ss.length;i++)ss[i].classList.remove('active');
+  document.getElementById('s'+n).classList.add('active');
+  var ds=app.querySelectorAll('.dot');
+  for(var j=0;j<ds.length;j++)ds[j].classList.toggle('on',j<n);
+  if(n===1)requestAnimationFrame(placeNo);
+}
+
+function placeNo(){
+  var yr=yesBtn.getBoundingClientRect(), ar=app.getBoundingClientRect();
+  noBtn.style.left=(yr.right-ar.left+14)+'px';
+  noBtn.style.top=(yr.top-ar.top+2)+'px';
+}
+
+function flee(){
+  escapes++;
+  var aw=app.clientWidth, ah=app.clientHeight, bw=noBtn.offsetWidth, bh=noBtn.offsetHeight;
+  noBtn.style.left=(8+Math.random()*(aw-bw-16))+'px';
+  noBtn.style.top=(8+Math.random()*(ah-bh-16))+'px';
+  var s=1+Math.min(escapes,8)*0.09;
+  yesBtn.style.transform='scale('+s+')';
+  noBtn.textContent=noTexts[Math.min(escapes,noTexts.length-1)];
+  fleeMsg.textContent=fleeMsgs[Math.min(escapes-1,fleeMsgs.length-1)];
+}
+noBtn.addEventListener('pointerenter',flee);
+noBtn.addEventListener('pointerdown',function(e){e.preventDefault();flee();});
+noBtn.addEventListener('click',function(e){e.preventDefault();flee();});
+app.addEventListener('pointermove',function(e){
+  if(!document.getElementById('s1').classList.contains('active'))return;
+  var r=noBtn.getBoundingClientRect();
+  var dx=e.clientX-(r.left+r.width/2), dy=e.clientY-(r.top+r.height/2);
+  if(Math.hypot(dx,dy)<95)flee();
+});
+window.addEventListener('resize',placeNo);
+
+yesBtn.addEventListener('click',function(){
+  var r=yesBtn.getBoundingClientRect(), ar=app.getBoundingClientRect();
+  for(var i=0;i<6;i++){
+    var h=document.createElement('span');
+    h.className='hb';
+    h.textContent='♥';
+    h.style.left=(r.left-ar.left+r.width/2-8+(Math.random()*80-40))+'px';
+    h.style.top=(r.top-ar.top-6)+'px';
+    h.style.color='rgba(240,139,180,.85)';
+    h.style.fontSize=(14+Math.random()*10)+'px';
+    app.appendChild(h);
+    (function(el){setTimeout(function(){el.remove();},1000);})(h);
+  }
+  noBtn.style.display='none';
+  setTimeout(function(){showStep(2);},350);
+});
+
+var dateInput=document.getElementById('dateInput');
+var dateBtn=document.getElementById('dateBtn');
+var datePrev=document.getElementById('datePrev');
+dateInput.min=new Date().toISOString().split('T')[0];
+dateInput.addEventListener('change',function(){
+  if(!dateInput.value){dateBtn.disabled=true;datePrev.textContent='';return;}
+  var d=new Date(dateInput.value+'T00:00:00');
+  var wk='日一二三四五六'[d.getDay()];
+  chosenDate=(d.getMonth()+1)+'月'+d.getDate()+'日 週'+wk;
+  datePrev.textContent='你選了：'+chosenDate+' ♥';
+  dateBtn.disabled=false;
+});
+dateBtn.addEventListener('click',function(){showStep(3);});
+
+var foods=app.querySelectorAll('.food');
+for(var k=0;k<foods.length;k++){
+  foods[k].addEventListener('click',function(){
+    for(var m=0;m<foods.length;m++)foods[m].classList.remove('sel');
+    this.classList.add('sel');
+    chosenFood=this.getAttribute('data-food');
+    setTimeout(function(){
+      document.getElementById('ld').textContent=chosenDate;
+      document.getElementById('lf').textContent=chosenFood;
+      document.getElementById('letterMeta').textContent='這場約會：'+chosenDate+' · '+chosenFood;
+      showStep(4);
+    },480);
+  });
+}
+
+document.getElementById('againBtn').addEventListener('click',function(){
+  escapes=0;
+  yesBtn.style.transform='scale(1)';
+  noBtn.textContent='否';
+  noBtn.style.display='';
+  fleeMsg.textContent='';
+  dateInput.value='';dateBtn.disabled=true;datePrev.textContent='';
+  for(var m=0;m<foods.length;m++)foods[m].classList.remove('sel');
+  showStep(1);
+  app.scrollIntoView({behavior:'smooth',block:'start'});
+});
+
+placeNo();
+})();
+</script>
+</body>
+</html>
